@@ -7,6 +7,7 @@
         public string WellKnown { get; set; }
         public string ServerUrl { get; set; }
         public string CallbackUrl { get; set; }
+        public string UserCallbackUrl { get; set; }
         public Token AccessToken { get; set; }
         public string Scopes { get; set; }
         public string State { get; set; }

@@ -17,6 +17,7 @@ namespace CSharpApp.Controllers
     {
         private readonly IConfiguration _configuration;
         private static JDeere _settings = new JDeere();
+        private static Status _status = new Status();
         public HomeController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -29,11 +30,19 @@ namespace CSharpApp.Controllers
             _settings.WellKnown = _configuration["JDeere:WellKnown"];
             _settings.ServerUrl = _configuration["JDeere:ServerUrl"];
             _settings.CallbackUrl = _settings.ServerUrl + _configuration["JDeere:Callback"];
+            _settings.UserCallbackUrl = _settings.ServerUrl + _configuration["JDeere:UserCallback"];
             _settings.Scopes = _configuration["JDeere:Scopes"];
             _settings.State = _configuration["JDeere:State"];
             _settings.APIURL = _configuration["JDeere:ApiUrl"];
 
             ViewBag.Settings = _settings;
+
+            return View();
+        }
+
+        public IActionResult Callback()
+        {
+            ViewBag.Status = _status;
 
             return View();
         }
@@ -62,6 +71,19 @@ namespace CSharpApp.Controllers
             string redirectUrl = QueryHelpers.AddQueryString(authEndpoint, queryParameters);
 
             return Redirect(redirectUrl);
+        }
+
+
+        [Route("/usercallback")]
+        public IActionResult UserCallback(string state, string status, string errorcode, string message)
+        {
+            _status.state = state;
+            _status.status = status;
+            _status.errorcode = errorcode;
+            _status.message = message;
+            ViewBag.Status = _status;
+
+            return View("Callback");
         }
 
         [Route("/callback")]
@@ -101,9 +123,9 @@ namespace CSharpApp.Controllers
 
         [HttpPost]
         [Route("/call-api")]
-        public async Task<IActionResult> CallAPI(string url)
+        public async Task<IActionResult> CallAPI(string url, string AccessToken)
         {
-            var response = await SecuredApiGetRequest(url);
+            var response = await SecuredApiGetRequest(url, AccessToken);
 
             response.EnsureSuccessStatusCode();
 
@@ -163,10 +185,15 @@ namespace CSharpApp.Controllers
             return oAuthMetadata;
         }
 
-        private async Task<HttpResponseMessage> SecuredApiGetRequest(string url)
+        private async Task<HttpResponseMessage> SecuredApiGetRequest(string url, string atoken)
         {
             var client = new HttpClient();
-            var token = _settings.AccessToken.access_token;
+
+            var token = atoken;
+            if(_settings.AccessToken != null)
+            {
+                token = _settings.AccessToken.access_token;
+            }
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.deere.axiom.v3+json"));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
@@ -182,7 +209,7 @@ namespace CSharpApp.Controllers
         /// required to finish the setup.</returns>
         private async Task<string> NeedsOrganizationAccess()
         {
-            var response = await SecuredApiGetRequest(_settings.APIURL + "/organizations");
+            var response = await SecuredApiGetRequest(_settings.APIURL + "/organizations", null);
 
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();

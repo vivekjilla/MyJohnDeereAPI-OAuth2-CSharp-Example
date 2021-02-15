@@ -9,7 +9,8 @@
     <title>Index</title>
 </head>
 <body>
-    <h3>Welcome to the My John Deere API C# Example</h3>
+    <h3>Welcome to the Farmbeats Integrated JohnDeere APIs example</h3>
+    <p><strong>User callback url: </strong> <span class="token">@ViewBag.Settings.UserCallbackUrl</span></p>
     <form action="/" method="post">
         <label for="WellKnown"><strong>Well Known Endpoint:</strong></label><br />
         <input placeholder="Your Well Known Endpoint goes here" size="100" type="text" id="WellKnown" name="WellKnown" value="@ViewBag.Settings.WellKnown"><br /><br />
@@ -24,7 +25,7 @@
         <label for="State"><strong>State:</strong></label><br />
         <input placeholder="Your State goes here" size="100" type="text" id="State" name="State" value="@ViewBag.Settings.State"><br /><br />
         <button type="submit" class="btn-primary">Connect!</button>
-    </form><br/>
+    </form><br />
     @if (ViewBag.Settings.AccessToken != null)
     {
         <div>
@@ -34,18 +35,19 @@
             <p class="token">@ViewBag.Settings.AccessToken.refresh_token</p>
         </div>
         <form action="/call-api" method="post">
-        <label for="url"><strong>Simple API Invote With Token:</strong></label><br />
-        <input size="100" type="url" id="url" name="url" value="@ViewBag.Settings.APIURL/organizations"><br/><br/>
-        <button type="submit" class="btn-primary">Go!</button>
+            <label for="url"><strong>Simple API Invote With Token:</strong></label><br />
+            <input size="100" type="url" id="url" name="url" value="@ViewBag.Settings.APIURL/organizations"><br /><br />
+            <button type="submit" class="btn-primary">Go!</button>
         </form>
 
-        @if(ViewBag.APIResponse != null) {
+        @if (ViewBag.APIResponse != null)
+        {
             <div>
-            <pre class="token">
-                <code class="language-json" >
-                    @ViewBag.APIResponse
-                </code>        
-            </pre>
+                <pre class="token">
+                    <code class="language-json">
+                        @ViewBag.APIResponse
+                    </code>        
+                </pre>
             </div>
         }
     }
