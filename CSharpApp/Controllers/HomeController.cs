@@ -75,12 +75,12 @@ namespace CSharpApp.Controllers
 
 
         [Route("/usercallback")]
-        public IActionResult UserCallback(string state, string status, string errorcode, string message)
+        public IActionResult UserCallback(string state = "", string status = "", string errorcode = "", string message = "")
         {
-            _status.state = state;
-            _status.status = status;
-            _status.errorcode = errorcode;
-            _status.message = message;
+            _status.state = state.ToLower();
+            _status.status = status.ToLower();
+            _status.errorcode = errorcode.ToLower();
+            _status.message = message.ToLower();
             ViewBag.Status = _status;
 
             return View("Callback");
